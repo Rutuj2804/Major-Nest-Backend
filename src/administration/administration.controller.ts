@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { JwtGuard } from 'src/authentication/guard';
 import { AdministrationService } from './administration.service';
-import { DefineRolesDTO } from './dto';
+import { AssignRolesDTO, DefineRolesDTO } from './dto';
 
 @UseGuards(JwtGuard)
 @Controller('administration')
@@ -27,5 +27,10 @@ export class AdministrationController {
     @Get("roles/university/:id")
     getDefinedRoles(@Param("id") id:string) {
         return this.administrationService.getDefinedRoles(id)
+    }
+
+    @Post("assign/:universityID")
+    assignRole(@Param("universityID") universityID:string, @Body() assignRolesDTO: AssignRolesDTO) {
+        return this.administrationService.assignRole(universityID, assignRolesDTO)
     }
 }

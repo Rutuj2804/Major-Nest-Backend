@@ -7,6 +7,7 @@ import { FacultyModule } from './faculty/faculty.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
+import { ClassModule } from './class/class.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { UserModule } from './user/user.module';
       isGlobal: true
     }),
     MongooseModule.forRoot("mongodb+srv://rutuj:rutuj@cluster0.1mbuvl3.mongodb.net/development?retryWrites=true&w=majority"),
-    UserModule
+    UserModule,
+    ClassModule
   ],
   controllers: [AppController],
   providers: [AppService],

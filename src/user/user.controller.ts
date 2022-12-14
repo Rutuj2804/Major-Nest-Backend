@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, Param, Put } from '@nestjs/common';
 import { User } from 'src/authentication/decorator';
 import { JwtGuard } from 'src/authentication/guard';
 import { AuthInterface } from 'src/authentication/interface';
@@ -19,6 +19,11 @@ export class UserController {
     @Post("university")
     createUniversity(@User() user:AuthInterface, @Body() universityDTO: UniversityDTO) {
         return this.userService.createUniveristy(universityDTO, user)
+    }
+
+    @Put("university/:id")
+    updateUniversity(@Param("id") id:string, @Body() universityDTO: UniversityDTO) {
+        return this.userService.updateUniversity(id, universityDTO)
     }
 
     @Get("university/:id")

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AuthDTO } from 'src/authentication/dto';
@@ -16,8 +16,22 @@ export class UserService {
         return university
     }
 
+    async updateUniversity(id: string, universityDTO: UniversityDTO) {
+        try {
+            let university = await this.universityModel.findByIdAndUpdate(id, universityDTO)
+            university = await this.universityModel.findById(id)
+            return university
+        } catch (error) {
+            throw new ForbiddenException("University not found")
+        }
+    }
+
     async getUniversity(id: string) {
-        const university = await this.universityModel.findById(id)
-        return university
+        try {
+            const university = await this.universityModel.findById(id)
+            return university
+        } catch (error) {
+            throw new ForbiddenException("University not found")
+        }
     }
 }

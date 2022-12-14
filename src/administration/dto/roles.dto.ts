@@ -23,3 +23,11 @@ export class DefineRolesDTO {
     @IsNotEmpty()
     faculty: number;
 }
+
+export class AssignRolesDTO {
+    @IsNotEmpty()
+    user: string;
+
+    @IsNotEmpty()
+    role: string;
+}
