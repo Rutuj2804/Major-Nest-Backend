@@ -10,5 +10,6 @@ import { JwtStrategy } from './strategy';
     imports: [MongooseModule.forFeature([{ name: 'Auth', schema: authSchema }]), JwtModule.register({})],
     providers: [AuthenticationService, JwtStrategy],
     controllers: [AuthenticationController],
+    exports: [MongooseModule]
 })
 export class AuthenticationModule {}
