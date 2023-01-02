@@ -8,6 +8,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { ClassModule } from './class/class.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { MessagingModule } from './messaging/messaging.module';
 
 @Module({
   imports: [
@@ -19,7 +21,11 @@ import { ClassModule } from './class/class.module';
     }),
     MongooseModule.forRoot("mongodb+srv://rutuj:rutuj@cluster0.1mbuvl3.mongodb.net/development?retryWrites=true&w=majority"),
     UserModule,
-    ClassModule
+    ClassModule,
+    MulterModule.register({
+      dest: './upload',
+    }),
+    MessagingModule
   ],
   controllers: [AppController],
   providers: [AppService],

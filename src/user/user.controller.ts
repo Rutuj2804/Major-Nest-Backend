@@ -30,4 +30,9 @@ export class UserController {
     getUniversity(@Param("id") id:string) {
         return this.userService.getUniversity(id)
     }
+
+    @Get("universities")
+    getUniversities(@User() user:AuthInterface) {
+        return this.userService.getAllUniversities(user._id)
+    }
 }

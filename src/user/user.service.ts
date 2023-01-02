@@ -34,4 +34,13 @@ export class UserService {
             throw new ForbiddenException("University not found")
         }
     }
+
+    async getAllUniversities(id: string) {
+        try {
+            const university = await this.universityModel.find({ user: id })
+            return university
+        } catch (error) {
+            throw new ForbiddenException("Something went wrong")
+        }
+    }
 }
