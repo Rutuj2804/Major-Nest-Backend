@@ -12,7 +12,12 @@ export const subjectSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
-    }
+    },
+    university: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Universities",
+        required: true
+    },
 }, {
     timestamps: true
 })

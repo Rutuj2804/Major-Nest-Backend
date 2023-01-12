@@ -1,5 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { User } from 'src/authentication/decorator';
 import { JwtGuard } from 'src/authentication/guard';
+import { AuthInterface } from 'src/authentication/interface';
 import { AdministrationService } from './administration.service';
 import { AssignRolesDTO, DefineRolesDTO } from './dto';
 
@@ -29,8 +31,18 @@ export class AdministrationController {
         return this.administrationService.getDefinedRoles(id)
     }
 
+    @Get("my/university/:id")
+    getMyRoleForUniversity(@Param("id") id:string, @User() user: AuthInterface) {
+        return this.administrationService.getMyRoleForUniversity(id, user._id)
+    }
+
     @Post("assign/:universityID")
     assignRole(@Param("universityID") universityID:string, @Body() assignRolesDTO: AssignRolesDTO) {
         return this.administrationService.assignRole(universityID, assignRolesDTO)
+    }
+
+    @Get("assign/:universityID")
+    getAssignRolesData(@Param("universityID") universityID:string, @User() user: AuthInterface) {
+        return this.administrationService.getAssignRolesData(universityID, user._id)
     }
 }

@@ -12,7 +12,8 @@ export const rolesSchema = new mongoose.Schema({
         ref: "University"
     },
     roles: {
-        type: [mongoose.Schema.Types.ObjectId],
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Roles Definition",
         required: true
     }
 }, {
@@ -31,11 +32,35 @@ export const defineRolesSchema = new mongoose.Schema({
     },
     students: {
         type: Number,
-        default: 0
+        default: 2
     },
     faculty: {
         type: Number,
+        default: 2
+    },
+    class: {
+        type: Number,
+        default: 2
+    },
+    subjects: {
+        type: Number,
         default: 0
+    },
+    events: {
+        type: Number,
+        default: 0
+    },
+    utilities: {
+        type: Number,
+        default: 0
+    },
+    assignments: {
+        type: Number,
+        default: 0
+    },
+    roles: {
+        type: Number,
+        default: 2
     }
 }, {
     timestamps: true

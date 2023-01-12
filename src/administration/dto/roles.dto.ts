@@ -22,6 +22,24 @@ export class DefineRolesDTO {
     
     @IsNotEmpty()
     faculty: number;
+    
+    @IsNotEmpty()
+    class: number;
+    
+    @IsNotEmpty()
+    subjects: number;
+    
+    @IsNotEmpty()
+    events: number;
+    
+    @IsNotEmpty()
+    utilities: number;
+    
+    @IsNotEmpty()
+    assignments: number;
+    
+    @IsNotEmpty()
+    roles: number;
 }
 
 export class AssignRolesDTO {

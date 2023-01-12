@@ -8,5 +8,11 @@ export interface DefineRolesInterface {
     university: string,
     name: string,
     students: number,
-    faculty: number
+    faculty: number,
+    class: number,
+    subjects: number,
+    events: number,
+    utilities: number,
+    assignments: number,
+    roles: number,
 }

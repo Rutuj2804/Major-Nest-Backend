@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator";
+import { IsEmail, IsNotEmpty } from "class-validator";
 
 export class ClassDTO {
     @IsNotEmpty()
@@ -26,4 +26,12 @@ export class SubjectDTO {
 
     @IsNotEmpty()
     faculty: [string];
+    
+    @IsNotEmpty()
+    university: string;
+}
+
+export class ManulStudentAddDTO {
+    @IsEmail()
+    email: string;
 }

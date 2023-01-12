@@ -7,15 +7,23 @@ export interface ClassInterface {
 
 export interface NotesInterface {
     user: string,
-    class: string,
+    subject: string,
     file: string
 }
 
 export interface AssignmentInterface {
     user: string,
-    class: string,
+    subject: string,
     file: string,
     title: string,
     description: string,
     submission: string,
+}
+
+export interface SubjectInterface {
+    university: string,
+    name: string,
+    faculty: [string],
+    class: string,
+    _id?: string
 }
