@@ -15,5 +15,6 @@ import { defineRolesSchema, rolesSchema } from './model';
   ],
   controllers: [AdministrationController],
   providers: [AdministrationService],
+  exports: [MongooseModule]
 })
 export class AdministrationModule { }

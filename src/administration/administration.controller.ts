@@ -26,6 +26,11 @@ export class AdministrationController {
         return this.administrationService.deleteDefinedRoles(id)
     }
 
+    @Delete("assigned/delete/:id")
+    deleteAssignedRoles(@Param("id") id:string) {
+        return this.administrationService.deleteAssignedRoles(id)
+    }
+
     @Get("roles/university/:id")
     getDefinedRoles(@Param("id") id:string) {
         return this.administrationService.getDefinedRoles(id)

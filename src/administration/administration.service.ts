@@ -37,7 +37,7 @@ export class AdministrationService {
 
     async updateDefinedRoles(defineRolesDTO: DefineRolesDTO, id: string) {
         try {
-            await this.defineRolesModel.findByIdAndUpdate(id, {
+            const defineRole = await this.defineRolesModel.findByIdAndUpdate(id, {
                 name: defineRolesDTO.name.toUpperCase(),
                 students: defineRolesDTO.students,
                 faculty: defineRolesDTO.faculty,
@@ -47,8 +47,7 @@ export class AdministrationService {
                 utilities: defineRolesDTO.utilities,
                 assignments: defineRolesDTO.assignments,
                 roles: defineRolesDTO.roles,
-            });
-            const defineRole = await this.defineRolesModel.findById(id);
+            }, { returnOriginal: false });
             return defineRole;
         } catch (error) {
             throw new ForbiddenException('Something went wrong while updating role');
@@ -69,6 +68,15 @@ export class AdministrationService {
         }
     }
 
+    async deleteAssignedRoles(id: string) {
+        try {
+            const roles = await this.assignRolesModel.findByIdAndDelete(id);
+            return roles;
+        } catch (error) {
+            throw new ForbiddenException('Role not found');
+        }
+    }
+
     async getDefinedRoles(id: string) {
         try {
             const defineRole = await this.defineRolesModel.find({ university: id });
@@ -81,7 +89,7 @@ export class AdministrationService {
     async getMyRoleForUniversity(id: string, user: string) {
         try {
             const defineRole = await this.assignRolesModel
-                .find({ university: id, user: user })
+                .findOne({ university: id, user: user })
                 .populate('roles');
             return defineRole;
         } catch (error) {
@@ -93,16 +101,16 @@ export class AdministrationService {
         try {
             const user = await this.authModel.findOne({ email: assignRolesDTO.user })
             if(!user) throw new ForbiddenException("No user exists with the given email id")
-            let role = await this.assignRolesModel.findOne({ user: user._id, university: univeristyID })
-            if(!role) {
-                role = new this.assignRolesModel({
-                    user: user._id,
-                    roles: assignRolesDTO.role,
-                    university: univeristyID,
-                });
-                await role.save();
-            }
-            return role;
+            const role = await this.assignRolesModel.findOne({ user: user._id, university: univeristyID }).populate("user").populate("roles")
+            if(role) return role
+            const newRole = new this.assignRolesModel({
+                user: user._id,
+                roles: assignRolesDTO.role,
+                university: univeristyID,
+            });
+            await newRole.save();
+            const returnRole = await this.assignRolesModel.findById(newRole._id).populate("user").populate("roles")
+            return returnRole;
         } catch (error) {
             console.log(error);
             

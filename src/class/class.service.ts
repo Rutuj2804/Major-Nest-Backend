@@ -5,6 +5,7 @@ import { AuthInterface } from 'src/authentication/interface';
 import { AssignmentDTO, ClassDTO, ManulStudentAddDTO, SubjectDTO } from './dto';
 import * as argon from "argon2"
 import { AssignmentInterface, ClassInterface, NotesInterface, SubjectInterface } from './interface';
+import { AssignRolesInterface, DefineRolesInterface } from 'src/administration/interface/roles.interface';
 
 @Injectable()
 export class ClassService {
@@ -15,6 +16,8 @@ export class ClassService {
         @InjectModel("Note") private readonly notesModel: Model<NotesInterface>, 
         @InjectModel("Assignment") private readonly assignmentModel: Model<AssignmentInterface>,
         @InjectModel("Subject") private readonly subjectModel: Model<SubjectInterface>,
+        @InjectModel("Role") private readonly assignRoleModel: Model<AssignRolesInterface>,
+        @InjectModel("Roles Definition") private readonly defineRoleModel: Model<DefineRolesInterface>,
     ) { }
 
     async createClass(classDTO: ClassDTO) {
@@ -71,6 +74,11 @@ export class ClassService {
     }
 
     async addStudents(id: string, file: Express.Multer.File) {
+
+        const classExist = await this.classModel.findById(id)
+
+        if(!classExist) throw new ForbiddenException("Class does not exist")
+
         let array = file.buffer.toString().split("\r")
 
         array = array.filter(a => a != "\n")
@@ -95,19 +103,23 @@ export class ClassService {
 
         const studentsID = []
 
+        const studentRole = await this.defineRoleModel.findOne({ university: classExist.university, name: "STUDENT" })
+
+        if(!studentRole) throw new ForbiddenException("No STUDENT role found")
+
         for (let i = 0; i < students.length; i++) {
             let user = await this.authModel.findOne({ email: students[i].email })
             if (!user) {
                 const hash = await argon.hash(students[i].email);
                 user = new this.authModel({ email: students[i].email, password: hash })
                 user.save()
+                const assignRoleToStudent = new this.assignRoleModel({ user: user._id, roles: studentRole._id, university: classExist.university })
+                assignRoleToStudent.save()
             }
             studentsID.push(user._id)
         }
 
-        let newClass = await this.classModel.findByIdAndUpdate(id, { students: studentsID })
-
-        newClass = await this.classModel.findById(id)
+        let newClass = await this.classModel.findByIdAndUpdate(id, { students: studentsID }, {returnOriginal: false})
         return newClass
     }
 
@@ -121,6 +133,13 @@ export class ClassService {
             }
             const classInstance = await this.classModel.findByIdAndUpdate(id, { $push: { students: user._id } }, { returnOriginal: false }).populate("students").populate("faculty")
 
+            const studentRole = await this.defineRoleModel.findOne({ university: classInstance.university, name: "STUDENT" })
+
+            if(!studentRole) throw new ForbiddenException("No STUDENT role found")
+
+            const assignRoleToStudent = new this.assignRoleModel({ user: user._id, roles: studentRole._id, university: classInstance.university })
+            assignRoleToStudent.save()
+
             return classInstance
         } catch (error) {
             throw new ForbiddenException("Something went wrong")
@@ -130,6 +149,11 @@ export class ClassService {
     async deleteStudentsFromClass(id: string, students: [string]) {
         try {
             const classInstance = await this.classModel.findByIdAndUpdate(id, { $pullAll: { students: students } }, { returnOriginal: false }).populate("students").populate("faculty")
+            
+            for (let i = 0; i < students.length; i++) {
+                await this.assignRoleModel.findOneAndDelete({ university: classInstance.university, user: students[i] })
+            }
+
             return classInstance
         } catch (error) {
             console.log(error);
@@ -157,6 +181,11 @@ export class ClassService {
     }
 
     async addFaculty(id: string, file: Express.Multer.File) {
+
+        const classExist = await this.classModel.findById(id)
+
+        if(!classExist) throw new ForbiddenException("Class does not exist")
+
         let array = file.buffer.toString().split("\r")
 
         array = array.filter(a => a != "\n")
@@ -181,12 +210,19 @@ export class ClassService {
 
         const facultyID = []
 
+        const facultyRole = await this.defineRoleModel.findOne({ university: classExist.university, name: "FACULTY" })
+
+        if(!facultyRole) throw new ForbiddenException("No FACULTY role found")
+
         for (let i = 0; i < faculty.length; i++) {
             let user = await this.authModel.findOne({ email: faculty[i].email })
             if (!user) {
                 const hash = await argon.hash(faculty[i].email);
                 user = new this.authModel({ email: faculty[i].email, password: hash })
                 user.save()
+
+                const assignRoleToFaculty = new this.assignRoleModel({ user: user._id, roles: facultyRole._id, university: classExist.university })
+                assignRoleToFaculty.save()
             }
             facultyID.push(user._id)
         }
@@ -207,6 +243,13 @@ export class ClassService {
             }
             const classInstance = await this.classModel.findByIdAndUpdate(id, { $push: { faculty: user._id } }, { returnOriginal: false }).populate("students").populate("faculty")
 
+            const facultyRole = await this.defineRoleModel.findOne({ university: classInstance.university, name: "FACULTY" })
+
+        if(!facultyRole) throw new ForbiddenException("No FACULTY role found")
+
+        const assignRoleToFaculty = new this.assignRoleModel({ user: user._id, roles: facultyRole._id, university: classInstance.university })
+                assignRoleToFaculty.save()
+
             return classInstance
         } catch (error) {
             throw new ForbiddenException("Something went wrong")
@@ -216,6 +259,11 @@ export class ClassService {
     async deleteFacultyFromClass(id: string, faculty: [string]) {
         try {
             const classInstance = await this.classModel.findByIdAndUpdate(id, { $pullAll: { faculty: faculty } }, { returnOriginal: false }).populate("students").populate("faculty")
+            
+            for (let i = 0; i < faculty.length; i++) {
+                await this.assignRoleModel.findOneAndDelete({ university: classInstance.university, user: faculty[i] })
+            }
+            
             return classInstance
         } catch (error) {
             throw new ForbiddenException("Something went wrong while deleting faculty")
