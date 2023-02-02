@@ -12,6 +12,8 @@ import {
     Put,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { User } from 'src/authentication/decorator';
 import { JwtGuard } from 'src/authentication/guard';
 import { AuthInterface } from 'src/authentication/interface';
@@ -36,6 +38,11 @@ export class ClassController {
     @Delete(':id')
     deleteClass(@Param('id') id: string) {
         return this.classService.deleteClass(id);
+    }
+
+    @Put('delete')
+    deleteClasses(@Body('classes') arr: [string]) {
+        return this.classService.deleteClasses(arr);
     }
 
     @Get("classes/:id")
@@ -107,12 +114,22 @@ export class ClassController {
     }
 
     @Post('add_notes/:id')
-    @UseInterceptors(FilesInterceptor('files'))
+    @UseInterceptors(FilesInterceptor('files', 10, {
+        storage: diskStorage({
+            destination: "./upload",
+            filename: (req, file, callback) => {
+                const date = Date.now()
+                callback(null, `${file.originalname.split('.')[0]}-${date}${extname(file.originalname)}`)
+            }
+        })
+    }))
     addNotesToClass(
         @Param('id') id: string,
+        @Body('id') subjectId: string,
         @UploadedFiles() files: Array<Express.Multer.File>,
+        @User() user: AuthInterface
     ) {
-        return this.classService.addNotes(id, files);
+        return this.classService.addNotes(id, subjectId, files, user._id);
     }
 
     @Delete('add_notes/:id')

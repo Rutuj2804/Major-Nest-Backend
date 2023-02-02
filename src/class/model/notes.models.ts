@@ -9,6 +9,10 @@ export const notesSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Class"
     },
+    class: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Class"
+    },
     file: {
         type: String,
         required: true

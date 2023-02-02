@@ -13,6 +13,9 @@ import { MessagingModule } from './messaging/messaging.module';
 
 @Module({
   imports: [
+    MulterModule.register({
+      dest: './upload',
+    }),
     AuthenticationModule, 
     AdministrationModule, 
     FacultyModule, 
@@ -22,9 +25,6 @@ import { MessagingModule } from './messaging/messaging.module';
     MongooseModule.forRoot("mongodb+srv://rutuj:rutuj@cluster0.1mbuvl3.mongodb.net/development?retryWrites=true&w=majority"),
     UserModule,
     ClassModule,
-    MulterModule.register({
-      dest: './upload',
-    }),
     MessagingModule
   ],
   controllers: [AppController],

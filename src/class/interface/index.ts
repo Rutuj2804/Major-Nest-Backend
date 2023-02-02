@@ -8,6 +8,7 @@ export interface ClassInterface {
 export interface NotesInterface {
     user: string,
     subject: string,
+    class: string,
     file: string
 }
 
@@ -21,7 +22,6 @@ export interface AssignmentInterface {
 }
 
 export interface SubjectInterface {
-    university: string,
     name: string,
     faculty: [string],
     class: string,
