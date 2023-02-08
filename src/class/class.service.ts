@@ -86,9 +86,33 @@ export class ClassService {
 
     async getMySubjects(user: string) {
         try {
-            const classID = await this.classModel.findOne({ students: user });
-            const subjects = await this.subjectModel.find({ class: classID });
-            return subjects;
+            const subs = [];
+            const classID = await this.classModel.find({
+                $or: [{ students: user }, { faculty: user }],
+            });
+
+            for (let i = 0; i < classID.length; i++) {
+                const subjects = await this.subjectModel.find({ class: classID[i] });
+                subs.push(...subjects);
+            }
+            return subs;
+        } catch (error) {
+            throw new ForbiddenException('Something went wrong');
+        }
+    }
+
+    async getAllSubjects(id: string) {
+        try {
+            const subs = [];
+            const classID = await this.classModel.find({ university: id });
+
+            for (let i = 0; i < classID.length; i++) {
+                const subjects = await this.subjectModel
+                    .find({ class: classID[i] })
+                    .populate('class');
+                subs.push(...subjects);
+            }
+            return subs;
         } catch (error) {
             throw new ForbiddenException('Something went wrong');
         }
@@ -391,20 +415,32 @@ export class ClassService {
         id: string,
         subjectId: string,
         files: Array<Express.Multer.File>,
-        user: string
+        user: string,
     ) {
-        const filesUploaded = []
+        const filesUploaded = [];
         for (let i = 0; i < files.length; i++) {
-            const file = new this.notesModel({ class: id, subject: subjectId, user: user, file: files[i].path });
-            await file.save()
-            filesUploaded.push(file)
+            const file = new this.notesModel({
+                class: id,
+                subject: subjectId,
+                user: user,
+                file: files[i].path,
+            });
+            await file.save();
+            const nFile = await this.notesModel
+                .findById(file._id)
+                .populate('subject')
+                .populate('class')
+                .populate('user');
+            filesUploaded.push(nFile);
         }
-        return filesUploaded
+        return filesUploaded;
     }
 
-    async deleteNotes(id: string) {
-        const note = await this.notesModel.findByIdAndDelete(id);
-        return note;
+    async deleteNotes(id: [string]) {
+        for (let i = 0; i < id.length; i++) {
+            await this.notesModel.findByIdAndDelete(id);
+        }
+        return id;
     }
 
     async getNotesFromSubject(id: string) {
@@ -413,14 +449,26 @@ export class ClassService {
     }
 
     async getAllNotes(user: string) {
-        const classes = await this.classModel.findOne({ students: user });
-        const subjects = await this.subjectModel.find({ class: classes });
+        const classes = await this.classModel.find({
+            $or: [{ students: user }, { faculty: user }],
+        });
+
+        const subs = [];
+
+        for (let i = 0; i < classes.length; i++) {
+            const subjects = await this.subjectModel.find({ class: classes[i] });
+            subs.push(...subjects);
+        }
 
         const notes = [];
-        for (let i = 0; i < subjects.length; i++) {
-            const notesOfSubject = await this.notesModel.find({
-                subject: subjects[i],
-            });
+        for (let i = 0; i < subs.length; i++) {
+            const notesOfSubject = await this.notesModel
+                .find({
+                    subject: subs[i],
+                })
+                .populate('subject')
+                .populate('class')
+                .populate('user');
             notes.push(...notesOfSubject);
         }
         return notes;
@@ -428,26 +476,60 @@ export class ClassService {
 
     async addAssignment(
         id: string,
+        subjectId: string,
         files: Array<Express.Multer.File>,
         assignmentDTO: AssignmentDTO,
+        user: AuthInterface,
     ) {
-        return assignmentDTO;
+        const filesUploaded = [];
+        for (let i = 0; i < files.length; i++) {
+            const file = new this.assignmentModel({
+                class: id,
+                subject: subjectId,
+                user: user,
+                file: files[i].path,
+                title: assignmentDTO.title,
+                description: assignmentDTO.description,
+                submission: assignmentDTO.submission,
+            });
+            await file.save();
+            const nFile = await this.assignmentModel
+                .findById(file._id)
+                .populate('subject')
+                .populate('class')
+                .populate('user');
+            filesUploaded.push(nFile);
+        }
+        return filesUploaded;
     }
 
-    async deleteAssignment(id: string) {
-        const assignment = await this.assignmentModel.findByIdAndDelete(id);
-        return assignment;
+    async deleteAssignment(id: [string]) {
+        for (let i = 0; i < id.length; i++) {
+            await this.assignmentModel.findByIdAndDelete(id[i]);
+        }
+        return id;
     }
 
     async getAllAssignments(user: string) {
-        const classes = await this.classModel.findOne({ students: user });
-        const subjects = await this.subjectModel.find({ class: classes });
+        const classes = await this.classModel.find({
+            $or: [{ students: user }, { faculty: user }],
+        });
+
+        const subs = [];
+        for (let i = 0; i < classes.length; i++) {
+            const subjects = await this.subjectModel.find({ class: classes });
+            subs.push(...subjects);
+        }
 
         const assignments = [];
-        for (let i = 0; i < subjects.length; i++) {
-            const assignmentsOfSubject = await this.assignmentModel.find({
-                subject: subjects[i],
-            });
+        for (let i = 0; i < subs.length; i++) {
+            const assignmentsOfSubject = await this.assignmentModel
+                .find({
+                    subject: subs[i],
+                })
+                .populate('subject')
+                .populate('class')
+                .populate('user');
             assignments.push(...assignmentsOfSubject);
         }
         return assignments;
@@ -460,12 +542,22 @@ export class ClassService {
             class: classID,
         });
         await subject.save();
-        return subject;
+        const res = await this.subjectModel.findById(subject._id).populate('class');
+        return res;
     }
 
     async deleteSubject(subjectID: string) {
         const subject = await this.subjectModel.findByIdAndDelete(subjectID);
         return subject;
+    }
+
+    async deleteBulkSubject(subjectID: [string]) {
+        const subs = [];
+        for (let i = 0; i < subjectID.length; i++) {
+            const subject = await this.subjectModel.findByIdAndDelete(subjectID[i]);
+            subs.push(subject._id);
+        }
+        return subs;
     }
 
     async getSubjectsOfAClass(classID: string) {

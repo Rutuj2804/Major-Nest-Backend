@@ -10,11 +10,18 @@ import { UserModule } from './user/user.module';
 import { ClassModule } from './class/class.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { MessagingModule } from './messaging/messaging.module';
+import { AssignmentsModule } from './assignments/assignments.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { LectureModule } from './lecture/lecture.module';
 
 @Module({
   imports: [
     MulterModule.register({
       dest: './upload',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'upload')
     }),
     AuthenticationModule, 
     AdministrationModule, 
@@ -25,7 +32,9 @@ import { MessagingModule } from './messaging/messaging.module';
     MongooseModule.forRoot("mongodb+srv://rutuj:rutuj@cluster0.1mbuvl3.mongodb.net/development?retryWrites=true&w=majority"),
     UserModule,
     ClassModule,
-    MessagingModule
+    MessagingModule,
+    AssignmentsModule,
+    LectureModule
   ],
   controllers: [AppController],
   providers: [AppService],

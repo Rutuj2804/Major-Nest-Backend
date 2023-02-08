@@ -65,6 +65,11 @@ export class ClassController {
         return this.classService.getMySubjects(user._id)
     }
 
+    @Get("admin/:id")
+    getAllSubjects(@Param('id') id: string) {
+        return this.classService.getAllSubjects(id)
+    }
+
     @Post('add_students/:id')
     @UseInterceptors(FileInterceptor('file'))
     addStudents(
@@ -113,10 +118,10 @@ export class ClassController {
         return this.classService.deleteFacultyFromClass(id, faculty)
     }
 
-    @Post('add_notes/:id')
+    @Post('add_notes/:id/:subjectID')
     @UseInterceptors(FilesInterceptor('files', 10, {
         storage: diskStorage({
-            destination: "./upload",
+            destination: "./upload/notes",
             filename: (req, file, callback) => {
                 const date = Date.now()
                 callback(null, `${file.originalname.split('.')[0]}-${date}${extname(file.originalname)}`)
@@ -125,16 +130,16 @@ export class ClassController {
     }))
     addNotesToClass(
         @Param('id') id: string,
-        @Body('id') subjectId: string,
+        @Param('subjectID') subjectId: string,
         @UploadedFiles() files: Array<Express.Multer.File>,
         @User() user: AuthInterface
     ) {
         return this.classService.addNotes(id, subjectId, files, user._id);
     }
 
-    @Delete('add_notes/:id')
+    @Put('add_notes')
     deleteNotesFromClass(
-        @Param('id') id: string,
+        @Body('id') id: [string],
     ) {
         return this.classService.deleteNotes(id);
     }
@@ -149,19 +154,29 @@ export class ClassController {
         return this.classService.getAllNotes(user._id)
     }
 
-    @Post('add_assignments/:id')
-    @UseInterceptors(FilesInterceptor('files'))
+    @Post('add_assignments/:id/:subjectID')
+    @UseInterceptors(FilesInterceptor('files', 10, {
+        storage: diskStorage({
+            destination: "./upload/assignments",
+            filename: (req, file, callback) => {
+                const date = Date.now()
+                callback(null, `${file.originalname.split('.')[0]}-${date}${extname(file.originalname)}`)
+            }
+        })
+    }))
     addAssignmentToClass(
         @Param('id') id: string,
+        @Param('subjectID') subjectId: string,
         @UploadedFiles() files: Array<Express.Multer.File>,
-        @Body() assignmentDTO:AssignmentDTO
+        @Body() assignmentDTO:AssignmentDTO,
+        @User() user: AuthInterface
     ) {
-        return this.classService.addAssignment(id, files, assignmentDTO);
+        return this.classService.addAssignment(id, subjectId, files, assignmentDTO, user);
     }
 
-    @Delete('add_assignments/:id')
+    @Put('add_assignments')
     deleteAssignmentFromClass(
-        @Param('id') id: string,
+        @Body('id') id: [string],
     ) {
         return this.classService.deleteAssignment(id);
     }
@@ -181,7 +196,12 @@ export class ClassController {
         return this.classService.deleteSubject(subjectID)
     }
 
-    @Get("class/:id")
+    @Put("subject")
+    deleteBulkSubject(@Body("id") subjectID:[string]) {
+        return this.classService.deleteBulkSubject(subjectID)
+    }
+
+    @Get("subject/:id")
     getSubjects(@Param("id") classID:string) {
         return this.classService.getSubjectsOfAClass(classID)
     }

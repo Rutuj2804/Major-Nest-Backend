@@ -7,7 +7,7 @@ export const notesSchema = new mongoose.Schema({
     },
     subject: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Class"
+        ref: "Subject"
     },
     class: {
         type: mongoose.Schema.Types.ObjectId,
