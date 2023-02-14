@@ -14,6 +14,8 @@ import { AssignmentsModule } from './assignments/assignments.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { LectureModule } from './lecture/lecture.module';
+import { EventsModule } from './events/events.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -34,7 +36,9 @@ import { LectureModule } from './lecture/lecture.module';
     ClassModule,
     MessagingModule,
     AssignmentsModule,
-    LectureModule
+    LectureModule,
+    EventsModule,
+    AnalyticsModule
   ],
   controllers: [AppController],
   providers: [AppService],
