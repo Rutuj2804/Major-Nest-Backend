@@ -16,6 +16,7 @@ import { join } from 'path';
 import { LectureModule } from './lecture/lecture.module';
 import { EventsModule } from './events/events.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { AnalyticsModule } from './analytics/analytics.module';
     AssignmentsModule,
     LectureModule,
     EventsModule,
-    AnalyticsModule
+    AnalyticsModule,
+    ChatModule
   ],
   controllers: [AppController],
   providers: [AppService],

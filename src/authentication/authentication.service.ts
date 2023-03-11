@@ -64,4 +64,9 @@ export class AuthenticationService {
         }
     }
 
+    async getUsers(username: string) {
+        const users = await this.authModel.find({ email: { $regex: username, $options : 'i' } })
+        return users
+    }
+
 }

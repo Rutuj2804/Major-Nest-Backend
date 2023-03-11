@@ -15,4 +15,9 @@ export class AuthenticationController {
     signin(@Body() dto: AuthDTO) {
         return this.authService.signin(dto)
     }
+
+    @Post('users')
+    getUsers(@Body("username") username: string) {
+        return this.authService.getUsers(username)
+    }
 }
