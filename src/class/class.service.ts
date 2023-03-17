@@ -123,7 +123,6 @@ export class ClassService {
 
         if (!classExist) throw new ForbiddenException('Class does not exist');
 
-        console.log(file);
         let array = file.buffer.toString().split('\r');
 
         array = array.filter((a) => a != '\n');

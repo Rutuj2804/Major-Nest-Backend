@@ -17,6 +17,7 @@ import { LectureModule } from './lecture/lecture.module';
 import { EventsModule } from './events/events.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { ChatModule } from './chat/chat.module';
+import { ResultsModule } from './results/results.module';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { ChatModule } from './chat/chat.module';
       dest: './upload',
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'upload')
+      rootPath: join(__dirname, '..')
     }),
     AuthenticationModule, 
     AdministrationModule, 
@@ -40,7 +41,8 @@ import { ChatModule } from './chat/chat.module';
     LectureModule,
     EventsModule,
     AnalyticsModule,
-    ChatModule
+    ChatModule,
+    ResultsModule
   ],
   controllers: [AppController],
   providers: [AppService],
