@@ -22,12 +22,17 @@ export class ChatController {
     }
 
     @Get("room/:id")
-    getMessagesOfRooms(@Param(":id") id: string) {
+    getMessagesOfRooms(@Param("id") id: string) {
         return this.chatService.getMessagesOfRooms(id)
     }
 
-    @Post("room/:id")
-    sendMessagesToRooms(@Param(":id") id: string, @Body("text") text:string, @User() user: AuthInterface) {
+    @Get("chat-space/:id")
+    getRoomSingle(@Param("id") id: string) {
+        return this.chatService.getRoomSingle(id)
+    }
+
+    @Post("msg/:id")
+    sendMessagesToRooms(@Param("id") id: string, @Body("text") text:string, @User() user: AuthInterface) {
         return this.chatService.sendMessagesToRooms(id, text, user._id)
     }
 }
