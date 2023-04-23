@@ -92,7 +92,7 @@ export class ClassService {
             });
 
             for (let i = 0; i < classID.length; i++) {
-                const subjects = await this.subjectModel.find({ class: classID[i] });
+                const subjects = await this.subjectModel.find({ class: classID[i] }).populate("class");
                 subs.push(...subjects);
             }
             return subs;
@@ -561,7 +561,7 @@ export class ClassService {
 
     async getSubjectsOfAClass(classID: string) {
         try {
-            const subject = await this.subjectModel.find({ class: classID });
+            const subject = await this.subjectModel.find({ class: classID }).populate("class");
             return subject;
         } catch (error) {
             throw new ForbiddenException('Something went wrong');

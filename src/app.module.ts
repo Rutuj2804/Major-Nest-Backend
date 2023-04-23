@@ -18,6 +18,7 @@ import { EventsModule } from './events/events.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { ChatModule } from './chat/chat.module';
 import { ResultsModule } from './results/results.module';
+import { FeesModule } from './fees/fees.module';
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { ResultsModule } from './results/results.module';
     EventsModule,
     AnalyticsModule,
     ChatModule,
-    ResultsModule
+    ResultsModule,
+    FeesModule
   ],
   controllers: [AppController],
   providers: [AppService],
