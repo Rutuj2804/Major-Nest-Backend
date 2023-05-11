@@ -19,6 +19,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { ChatModule } from './chat/chat.module';
 import { ResultsModule } from './results/results.module';
 import { FeesModule } from './fees/fees.module';
+import { AttendenceModule } from './attendence/attendence.module';
 
 @Module({
   imports: [
@@ -44,7 +45,8 @@ import { FeesModule } from './fees/fees.module';
     AnalyticsModule,
     ChatModule,
     ResultsModule,
-    FeesModule
+    FeesModule,
+    AttendenceModule
   ],
   controllers: [AppController],
   providers: [AppService],

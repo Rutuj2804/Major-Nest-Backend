@@ -65,7 +65,7 @@ export class ClassService {
 
     async getClassByID(id: string) {
         try {
-            const classes = await this.classModel.findById(id);
+            const classes = await this.classModel.findById(id).populate("students").populate("faculty");
             return classes;
         } catch (error) {
             throw new ForbiddenException('Something went wrong');
