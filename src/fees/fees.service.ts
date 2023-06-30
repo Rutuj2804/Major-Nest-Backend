@@ -43,7 +43,7 @@ export class FeesService {
             const fees = []
             for (let i = 0; i < classes.length; i++) {
                 const s = await this.feeModel.find({ class: classes[i] }).populate("class").populate("university").populate("user")
-                fees.push(s)
+                fees.push(...s)
             }
             return fees
         } else {
@@ -51,7 +51,7 @@ export class FeesService {
             const fees = []
             for (let i = 0; i < classes.length; i++) {
                 const s = await this.feeModel.find({ class: classes[i] }).populate("class").populate("university").populate("user")
-                fees.push(s)
+                fees.push(...s)
             }
             return fees
         }

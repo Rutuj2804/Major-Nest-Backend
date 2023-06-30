@@ -336,10 +336,11 @@ export class ClassService {
 
         let newClass = await this.classModel.findByIdAndUpdate(id, {
             faculty: facultyID,
-        });
+        },
+        { returnOriginal: false },).populate('students')
+        .populate('faculty');
 
-        newClass = await this.classModel.findById(id);
-        return newClass;
+        return newClass
     }
 
     async addFacultyManual(id: string, manulStudentAddDTO: ManulStudentAddDTO) {

@@ -9,6 +9,6 @@ async function bootstrap() {
   app.enableCors()
   app.useGlobalPipes(new ValidationPipe())
   app.useStaticAssets(join(__dirname, '..'));
-  await app.listen(5000);
+  await app.listen(5002);
 }
 bootstrap();
